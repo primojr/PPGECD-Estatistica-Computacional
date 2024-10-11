@@ -4,4 +4,4 @@
 > Universidade Federal da Bahia (UFBA)  
 
 ## Links Uteis: 
-1. [Material do curso](https://castlab.org/courses/MProbPGECD/)
+1. [Lista de execicio 1]("pdf/Lista R - PGMAT0061.pdf")
