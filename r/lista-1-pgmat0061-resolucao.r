@@ -37,7 +37,7 @@ correlacao(x,y)
 
 #f.d.p
 f_X <- function(x) {
-  case_when(
+  dplyr::case_when(
     x >= 0 & x <= 2 ~ (1/10*x + 1/10)
   , x  > 2 & x <= 6 ~ (-3/40*x + 9/20)
   , TRUE ~ 0
