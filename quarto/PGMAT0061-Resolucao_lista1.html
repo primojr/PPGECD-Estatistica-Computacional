@@ -109,8 +109,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="questão-1" class="level2">
 <h2 class="anchored" data-anchor-id="questão-1">1. Questão 1</h2>
 <p>Escreva uma função no R para calcular o coeficiente de correlação linear de Pearson entre duas variáveis. Compare os resultados de sua função com aqueles obtidos pelo R mediante o uso da função cor (.). Para isso, considere o conjunto de dados a seguir:</p>
-<section id="definição-da-função" class="level3">
-<h3 class="anchored" data-anchor-id="definição-da-função">1.1 Definição da função</h3>
+<section id="criar-a-função" class="level3">
+<h3 class="anchored" data-anchor-id="criar-a-função">1.1 Criar a função</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>correlacao <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># numerador  </span></span>
@@ -162,8 +162,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="a-mostre-que-fx-é-uma-f.d.p" class="level3">
 <h3 class="anchored" data-anchor-id="a-mostre-que-fx-é-uma-f.d.p">2.a Mostre que f(x) é uma f.d.p</h3>
-<section id="para-qq-x-fx-0" class="level4">
-<h4 class="anchored" data-anchor-id="para-qq-x-fx-0">1. Para qq x, f(x) &gt;= 0</h4>
+<section id="para-qualquer-x_i-fx-0" class="level4">
+<h4 class="anchored" data-anchor-id="para-qualquer-x_i-fx-0">1. Para qualquer x_i, f(x) &gt;= 0</h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>min_x <span class="ot">=</span> <span class="dv">0</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f_X</span>(min_x) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="co"># TRU</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -178,8 +178,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Como f(x) é maior que zero para o valor minimo e maximo da função, então f(x) &gt;= 0</p>
 </section>
-<section id="fx-1" class="level4">
-<h4 class="anchored" data-anchor-id="fx-1">2. F(x) = 1</h4>
+<section id="fx_i-1" class="level4">
+<h4 class="anchored" data-anchor-id="fx_i-1">2. F(x_i) = 1</h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>F_X <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">if_else</span>(x <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> x <span class="sc">&lt;=</span> <span class="dv">6</span>, <span class="fu">integrate</span>(f_X, <span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> x)<span class="sc">$</span>value, <span class="dv">0</span>)  </span>
@@ -198,7 +198,7 @@ então F(6) = 1 =&gt; f(x) é f.d.p</code></pre>
 <h3 class="anchored" data-anchor-id="b-gráfico-de-fx.">2.b Gráfico de f(x).</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">6</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">sapply</span>(x, f_X)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(x, f_X)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
@@ -257,16 +257,78 @@ com renda superior a 4.5 u.m é 8.44%</code></pre>
 </section>
 <section id="questão-3" class="level2">
 <h2 class="anchored" data-anchor-id="questão-3">3. Questão 3</h2>
-<section id="a-seja-a-amostra-abaixo-obtida-de-uma-distribuição-poisson-de-parâmetro-lampda" class="level3">
-<h3 class="anchored" data-anchor-id="a-seja-a-amostra-abaixo-obtida-de-uma-distribuição-poisson-de-parâmetro-lampda">3.a Seja a amostra abaixo obtida de uma distribuição Poisson de parâmetro lampda:</h3>
+<section id="seja-a-amostra-abaixo-obtida-de-uma-distribuição-poisson-de-parâmetro-lampda" class="level3">
+<h3 class="anchored" data-anchor-id="seja-a-amostra-abaixo-obtida-de-uma-distribuição-poisson-de-parâmetro-lampda">Seja a amostra abaixo obtida de uma distribuição Poisson de parâmetro lampda:</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">4</span>, <span class="dv">6</span>,<span class="dv">2</span>, <span class="dv">2</span>,<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="a.1-obtenha-o-gráfico-da-função-de-log-verossimilhança" class="level4">
-<h4 class="anchored" data-anchor-id="a.1-obtenha-o-gráfico-da-função-de-log-verossimilhança">3.a.1 Obtenha o gráfico da função de log-verossimilhança</h4>
+<section id="obtenha-o-gráfico-da-função-de-log-verossimilhança" class="level4">
+<h4 class="anchored" data-anchor-id="obtenha-o-gráfico-da-função-de-log-verossimilhança">3.1 Obtenha o gráfico da função de log-verossimilhança</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Funcão da log verossimilhança</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>log_vero_poisson <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda, x) {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    x <span class="sc">*</span> <span class="fu">log</span>(lambda) </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> lambda </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span> <span class="fu">log</span>(<span class="fu">factorial</span>(x))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Vetor de lambdas</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>lambdas <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="dv">10</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplicar a funcão para um vetor de lambda</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>valores_log_vero <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(lambdas, <span class="sc">~</span><span class="fu">log_vero_poisson</span>(.x, x))</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data_frame</span>(lambdas, valores_log_vero)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `data_frame()` was deprecated in tibble 1.1.0.
+ℹ Please use `tibble()` instead.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> lambdas, <span class="at">y =</span> valores_log_vero))  <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> .<span class="dv">85</span>) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">'Função de log-verossimilhança ~Poision(lampda)'</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">'Valores de lambdas'</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">'log verossemelhança'</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="PGMAT0061-Resolucao_lista1_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="a.2-encontre-a-e.m.v.-de-λ-e-represente-a-no-gráfico-anterior" class="level4">
-<h4 class="anchored" data-anchor-id="a.2-encontre-a-e.m.v.-de-λ-e-represente-a-no-gráfico-anterior">3.a.2 Encontre a E.M.V. de λ e represente-a no gráfico anterior</h4>
+<section id="encontre-a-e.m.v.-de-λ-e-represente-a-no-gráfico-anterior" class="level4">
+<h4 class="anchored" data-anchor-id="encontre-a-e.m.v.-de-λ-e-represente-a-no-gráfico-anterior">3.2 Encontre a E.M.V. de λ e represente-a no gráfico anterior</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>EMV <span class="ot">=</span> <span class="fu">mean</span>(x)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> lambdas, <span class="at">y =</span> valores_log_vero))  <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> .<span class="dv">85</span>) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> EMV, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size =</span> .<span class="dv">85</span>) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> EMV, <span class="at">y =</span> <span class="fu">max</span>(valores_log_vero), </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"EMV ="</span>, <span class="fu">round</span>(EMV, <span class="dv">2</span>)), </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">vjust =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">'Função de log-verossimilhança ~Poision(lampda)'</span>,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">'Valores de lambdas'</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">'log verossemelhança'</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="PGMAT0061-Resolucao_lista1_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="questão-4" class="level3">

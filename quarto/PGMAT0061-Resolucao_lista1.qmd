@@ -1,7 +1,7 @@
 ---
 title: "Resolução Lista de exercicio 1"
 author: "Aluno: Gerson"
-format: html
+format: pdf
 editor: visual
 ---
 
@@ -17,7 +17,7 @@ library(tidyverse)
 
 Escreva uma função no R para calcular o coeficiente de correlação linear de Pearson entre duas variáveis. Compare os resultados de sua função com aqueles obtidos pelo R mediante o uso da função cor (.). Para isso, considere o conjunto de dados a seguir:
 
-### 1.1 Definição da função
+### 1.1 Criar a função
 
 ```{r}
 correlacao <- function(x, y) {
@@ -68,7 +68,7 @@ f_X <- function(x) {
 
 ### 2.a Mostre que f(x) é uma f.d.p
 
-#### 1. Para qq x, f(x) \>= 0
+#### 1. Para qualquer x_i, f(x) \>= 0
 
 ```{r}
 min_x = 0
@@ -80,7 +80,7 @@ f_X(max_x) > 0 # TRUE
 
 Como f(x) é maior que zero para o valor minimo e maximo da função, então f(x) \>= 0
 
-#### 2. F(x) = 1
+#### 2. F(x_i) = 1
 
 ```{r}
 F_X <- function(x) {
@@ -96,7 +96,7 @@ glue::glue("Seja x = 6 o limite superior de X,
 
 ```{r}
 x <- seq(0, 6, by = 0.1)
-y <- sapply(x, f_X)
+y <- purrr::map_dbl(x, f_X)
 
 df <- data.frame(x = x, y = y)
 
@@ -136,23 +136,58 @@ Var_X |> round(2)
 
 ## 3. Questão 3
 
-### 3.a Seja a amostra abaixo obtida de uma distribuição Poisson de parâmetro lampda:
+### Seja a amostra abaixo obtida de uma distribuição Poisson de parâmetro lampda:
 
 ```{r}
 x <- c(5,4, 6,2, 2,4, 5, 3, 3, 0, 1, 7, 6, 5, 3, 6, 5, 3, 7, 2)
 ```
 
-#### 3.a.1 Obtenha o gráfico da função de log-verossimilhança
+#### 3.1 Obtenha o gráfico da função de log-verossimilhança
 
 ```{r}
+# Funcão da log verossimilhança
+log_vero_poisson <- function(lambda, x) {
+  sum(
+    x * log(lambda) 
+      - lambda 
+      - log(factorial(x))
+    )
+}
+
+# Vetor de lambdas
+lambdas <- seq(0.1, 10)
+
+# Aplicar a funcão para um vetor de lambda
+valores_log_vero <- map_dbl(lambdas, ~log_vero_poisson(.x, x))
+
+df <- data_frame(lambdas, valores_log_vero)
+
+ggplot(df, aes(x = lambdas, y = valores_log_vero))  +
+  geom_line(color = "red", size = .85) +
+  labs(
+    title = 'Função de log-verossimilhança ~Poision(lampda)',
+    x = 'Valores de lambdas',
+    y = 'log verossemelhança'
+  )
 
 ```
 
-#### 3.a.2 Encontre a E.M.V. de λ e represente-a no gráfico anterior
+#### 3.2 Encontre a E.M.V. de λ e represente-a no gráfico anterior
 
 ```{r}
+EMV = mean(x)
 
-
+ggplot(df, aes(x = lambdas, y = valores_log_vero))  +
+  geom_line(color = "red", size = .85) +
+  geom_vline(xintercept = EMV, color = "blue", linetype = "dashed", size = .85) +
+  annotate("text", x = EMV, y = max(valores_log_vero), 
+           label = paste("EMV =", round(EMV, 2)), 
+           vjust = 2, color = "blue") +
+  labs(
+    title = 'Função de log-verossimilhança ~Poision(lampda)',
+    x = 'Valores de lambdas',
+    y = 'log verossemelhança'
+  ) 
 ```
 
 ### Questão 4
