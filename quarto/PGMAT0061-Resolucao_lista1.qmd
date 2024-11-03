@@ -2,7 +2,7 @@
 title: "Resolução Lista de exercicio 1"
 author: "Aluno: Gerson"
 format: html
-editor: visual
+e†ditor: visual
 ---
 
 pdf/Lista R - PGMAT0061.pdf
@@ -55,6 +55,7 @@ glue::glue("A correlação calculada é {a} e a correlação do R é {b}")
 Numa determinada localidade, a distribuição de renda (em unidades monetárias, u.m.) é uma variável aleatória X com função de distribuição de probabilidade:
 
 ### f.d.p
+
 > Definir a função de probabilidade
 
 ```{r}
@@ -182,10 +183,11 @@ glue::glue("O valor de lambda que maximiza a função de log-verosemelhança é 
 ```
 
 ### Questão 4
+
 Teste Qui-Quadrado para proporções
 
-* H0: Os fenotipos seguem a relação 9:3:3:1.  
-* H1: Os fenotipos não seguem a relação 9:3:3:1.   
+-   H0: Os fenotipos seguem a relação 9:3:3:1.\
+-   H1: Os fenotipos não seguem a relação 9:3:3:1.
 
 ```{r, warning=FALSE}
 # Dados
@@ -203,5 +205,3 @@ glue::glue("Como o p-valor({p_value |> round(4)}) é maior que 0.05,
             Não temos evidencia para rejeitamos a hipótese de que
             os fenotiopos seguem a relação 9:3:3:1")
 ```
-
-
