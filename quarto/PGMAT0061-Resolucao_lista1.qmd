@@ -1,7 +1,7 @@
 ---
 title: "Resolução Lista de exercicio 1"
 author: "Aluno: Gerson"
-format: pdf
+format: html
 editor: visual
 ---
 
@@ -55,6 +55,7 @@ glue::glue("A correlação calculada é {a} e a correlação do R é {b}")
 Numa determinada localidade, a distribuição de renda (em unidades monetárias, u.m.) é uma variável aleatória X com função de distribuição de probabilidade:
 
 ### f.d.p
+> Definir a função de probabilidade
 
 ```{r}
 f_X <- function(x) {
@@ -72,15 +73,17 @@ f_X <- function(x) {
 
 ```{r}
 min_x = 0
-f_X(min_x) > 0 # TRU
+f_X(min_x) >= 0 # TRU
 
 max_x = 6
-f_X(max_x) > 0 # TRUE
+f_X(max_x) >= 0 # TRUE
 ```
 
 Como f(x) é maior que zero para o valor minimo e maximo da função, então f(x) \>= 0
 
-#### 2. F(x_i) = 1
+#### 2. F(x_i) = 1 (Acumulada 0 a 6)
+
+> Definir a função de distribuição acumulada
 
 ```{r}
 F_X <- function(x) {
@@ -145,49 +148,60 @@ x <- c(5,4, 6,2, 2,4, 5, 3, 3, 0, 1, 7, 6, 5, 3, 6, 5, 3, 7, 2)
 #### 3.1 Obtenha o gráfico da função de log-verossimilhança
 
 ```{r}
-# Funcão da log verossimilhança
-log_vero_poisson <- function(lambda, x) {
-  sum(
-    x * log(lambda) 
-      - lambda 
-      - log(factorial(x))
-    )
+# Função de log-verosemelhança
+log_verosemelhanca <- function(lambda, x){
+  n <- length(x)
+    sum(x) *
+      log(lambda) - 
+      n*lambda - 
+      sum(log(factorial(x)))
 }
 
-# Vetor de lambdas
-lambdas <- seq(0.1, 10)
+# Valores de lampda
+lambda <- seq(0, 10, 0.01)
 
-# Aplicar a funcão para um vetor de lambda
-valores_log_vero <- map_dbl(lambdas, ~log_vero_poisson(.x, x))
+# log-verosemelhança
+log_vero_poisson  <- purrr::map_dbl(lambda, ~log_verosemelhanca(.x, x))
 
-df <- data_frame(lambdas, valores_log_vero)
+# Grafico 
+plot(lambda,
+     log_vero_poisson,
+     type = "l",
+     xlab = expression(lambda),
+     ylab = "Log-verosemelhança"
+     )
+lambda_max <- lambda[which.max(log_vero_poisson)]
+abline(v = lambda_max, col = "red")
+text(lambda_max, max(log_vero_poisson),
+     paste("lambda_max =", round(lambda_max, 2)),
+     pos = 4)
 
-ggplot(df, aes(x = lambdas, y = valores_log_vero))  +
-  geom_line(color = "red", size = .85) +
-  labs(
-    title = 'Função de log-verossimilhança ~Poision(lampda)',
-    x = 'Valores de lambdas',
-    y = 'log verossemelhança'
-  )
 
-```
+glue::glue("O valor de lambda que maximiza a função de log-verosemelhança é {lambda_max |> round(2)}")
 
-#### 3.2 Encontre a E.M.V. de λ e represente-a no gráfico anterior
-
-```{r}
-EMV = mean(x)
-
-ggplot(df, aes(x = lambdas, y = valores_log_vero))  +
-  geom_line(color = "red", size = .85) +
-  geom_vline(xintercept = EMV, color = "blue", linetype = "dashed", size = .85) +
-  annotate("text", x = EMV, y = max(valores_log_vero), 
-           label = paste("EMV =", round(EMV, 2)), 
-           vjust = 2, color = "blue") +
-  labs(
-    title = 'Função de log-verossimilhança ~Poision(lampda)',
-    x = 'Valores de lambdas',
-    y = 'log verossemelhança'
-  ) 
 ```
 
 ### Questão 4
+Teste Qui-Quadrado para proporções
+
+* H0: Os fenotipos seguem a relação 9:3:3:1.  
+* H1: Os fenotipos não seguem a relação 9:3:3:1.   
+
+```{r, warning=FALSE}
+# Dados
+obeservado <- c(190, 50, 63, 20)
+obeservado <- obeservado/sum(obeservado)
+
+esperado <- c(9, 3, 3, 1)
+esperado <- esperado/sum(esperado)
+
+# Teste Qui-Quadrado
+teste <- chisq.test(obeservado, esperado)
+p_value <- teste$p.value
+print(teste)
+glue::glue("Como o p-valor({p_value |> round(4)}) é maior que 0.05,
+            Não temos evidencia para rejeitamos a hipótese de que
+            os fenotiopos seguem a relação 9:3:3:1")
+```
+
+
