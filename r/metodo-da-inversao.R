@@ -16,7 +16,7 @@ GeradorWichmannHill <- function(N = 1000, x0 = 1, y0 = 1, z0 = 1) {
     
     u[i] = (x/30269 + y/30307 + z/30323)%%1
   }
-  u
+  return(u)
 }
 
 GeradorWichmannHill(100) |> hist()
@@ -27,8 +27,9 @@ GeradorWichmannHill(100) |> hist()
 # U ~ U(a, b)
 dist.Uniforme <- function(N = 1000, a = 0, b = 1,
                           x1 = 1, x2 = 2, x3 = 3) {
-  u = GeradorWichmannHill(N)
-  a + u * (b - a)
+  u = runif(N)
+  x = a + u * (b - a)
+  return(x)
 }
 
 Ns <- c(100, 1000, 10000)
@@ -45,10 +46,10 @@ purrr::walk(Ns, a = 1,b = 6, histograma)
 
 # Logistica
 # U ~ Log(mu, s)
-
 dist.Logistica <- function(N = 1000, mu = 0, s = 1) {
-  u = GeradorWichmannHill(N)
-  mu + s * log(u/(1 - u))
+  u <- runif(N)
+  x <- mu + s * log(u/(1 - u))
+  return(x)
 }
 
 histograma <- function(N, mu, s) {
@@ -62,3 +63,34 @@ par(mfrow = c(1, 3))
 Ns <- c(100, 1000, 10000)
 purrr::walk(Ns, mu = 5, s = 1, histograma)
 
+
+# Poisson 
+# U ~ Poisson(lambda)
+dist.Poisson <- function(lambda) {
+  prod.u <- 1
+  k <- 0
+  
+  while (prod.u >= exp(-lambda)) {
+    u <- runif(1)  
+    prod.u <- prod.u * u  
+    k <- k + 1  
+  }
+  return(k - 1)  
+}
+
+par(mfrow = c(1, 3))
+
+Ns <- c(100, 1000, 10000)  # Número de amostras desejadas
+lambda <- 5  # Parâmetro da Poisson
+
+x <- map_dbl(1:Ns[3], ~ dist.Poisson(lambda))
+hist(x, freq = FALSE, col = "lightblue", border = "black", 
+     main = paste("N =", length(x)))
+curve(dpois(x,lambda = 5), add = TRUE, col = "red")
+
+rpois(10000, lambda) |> 
+  hist(freq = FALSE,
+       col = "lightblue",
+       border = "black",
+       main = paste("Poisson R: N =", 10000)
+       )
