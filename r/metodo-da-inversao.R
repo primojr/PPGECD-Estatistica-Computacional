@@ -94,21 +94,3 @@ rpois(10000, lambda) |>
        border = "black",
        main = paste("Poisson R: N =", 10000)
        )
-
-
-histograma <- function(N, lambda) {
-  x <- map_dbl(1:Ns, ~ dist.Poisson(lambda))
-  hist(x, freq = FALSE, col = "lightblue", border = "black", 
-       main = paste("N =", length(x)))
-  curve(dpois(x,lambda), add = TRUE, col = "red")
-  }
-
-purrr::walk(Ns, lambda, histograma)
-
-
-
-
-
-
-
-
