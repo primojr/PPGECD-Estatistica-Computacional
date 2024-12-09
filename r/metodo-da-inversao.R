@@ -80,8 +80,9 @@ dist.Poisson <- function(lambda) {
 
 par(mfrow = c(1, 3))
 
-Ns <- c(100, 1000, 10000)  # Número de amostras desejadas
-lambda <- 5  # Parâmetro da Poisson
+
+Ns <- c(100, 1000, 10000) 
+lambda <- 5 
 
 x <- map_dbl(1:Ns[3], ~ dist.Poisson(lambda))
 hist(x, freq = FALSE, col = "lightblue", border = "black", 
@@ -93,4 +94,27 @@ rpois(10000, lambda) |>
        col = "lightblue",
        border = "black",
        main = paste("Poisson R: N =", 10000)
-       )
+)
+
+
+## Metodo polar 
+gerar_normal <- function() {
+  repeat {
+    u1 <- runif(1)*2 - 1
+    u2 <- runif(1)*2 - 1
+    
+    u <- u1^2 + u2^2
+    
+    if(u < 1) {
+      x <- u1 * sqrt(-2 * log(u) / u)
+      return(x)
+    }
+  }
+}
+
+n <- 10000
+x <- purrr::map_dbl(1:n, ~gerar_normal())
+
+hist(x, probability = TRUE
+     , col = "lightblue", main = "Hist. n = ")
+curve(dnorm(x, mean = 0, sd = 1), add = TRUE, col = "red")
