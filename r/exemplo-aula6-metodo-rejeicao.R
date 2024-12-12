@@ -1,5 +1,5 @@
 #
-## Metodo da rejeição - Geral
+# Metodo da rejeição - Geral
 #
 metodo_rejeicao <- function() {
   repeat {
@@ -23,7 +23,7 @@ amostra$x |> hist(probability = TRUE, main = paste('N = ', n))
 curve(3/4*(1-x^2), from = -1, to = 1, col = "red", lwd = 1, add = TRUE)
 
 #
-## Metodo da rejeição - “squeezing” 
+# Metodo da rejeição - “squeezing” 
 #
 metodo_rejeicao_squeezing <- function() {
   repeat {
@@ -39,9 +39,9 @@ metodo_rejeicao_squeezing <- function() {
   }
 }
 
-n = 10000
+n = 100000
 metodo_rejeicao()
-amostra <- purrr::map_df(1:n, ~metodo_rejeicao())  
+amostra <- purrr::map_df(1:n, ~metodo_rejeicao_squeezing())  
 
 amostra$contagem |> table() |> prop.table()
 
