@@ -61,3 +61,14 @@ resultado <- purrr::map_dbl(1:n, ~ F_x())
 resultado |> janitor::tabyl()
 
 
+dist.normal <- function() {
+
+  y1 <- rexp(n = 1, rate = 1)
+  y2 <- rexp(n = 1, rate = 1)
+  
+  if(y2 > ((1 - y1)^2)/2) {
+    u <- runif(n = 1, min = 0, max = 1)
+    x <- ifelse(u <= .5, y1, -y1)
+  }
+  return(x)
+}
