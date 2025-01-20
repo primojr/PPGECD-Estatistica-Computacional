@@ -1,6 +1,6 @@
 ---
 title: "Resolucao_Lista1"
-format: html
+format: ipynb
 author: Gerson Jr
 editor: visual
 ---
