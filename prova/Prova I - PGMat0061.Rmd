@@ -1,0 +1,221 @@
+---
+title: "Resolução da Prova PGMAT0061"
+author: "Gerson Primo Jr"
+date: "2025-02-05"
+output: html_document
+---
+#
+##### Pacotes necessários para a execução do código
+
+```{r, warning=FALSE, message=FALSE}
+# 
+instalar_pkt <- function(pacotes) {
+  instalados <- pacotes %in% installed.packages()[, "Package"]
+  if (any(!instalados)) install.packages(pacotes[!instalados])
+}
+
+instalar_pkt(c("purrr", "ggplot2", "glue", "dplyr", "VGAM", "actuar"))
+
+#
+library(ggplot2)
+library(dplyr)
+```
+
+### Questão 1.
+
+Escreva um algoritimo de simulação para gerar uma valores
+
+##### a) Distribuição Bell-Touchard
+
+A variável aleatória $X$ possui função massa de probabilidade dada por:
+
+$$
+P(X = x) = \frac{e^{\theta (1 - e^{-\alpha})} \alpha^x T_x(\theta)}{x!}, \quad x = 0, 1, 2, \dots
+$$
+
+onde $T_x(\theta)$ são os polinômios de Touchard definidos por:
+
+$$
+T_x(\theta) = e^{-\theta} \sum_{k=0}^{\infty} \frac{k^x \theta^k}{k!}
+$$
+
+
+```{r}
+# Passo 1: Função para calcular o polinômio de Touchard
+tx <- function(x, theta, max_k = 100) {
+  k <- 0:max_k
+  terms <- (k^x) * (theta^k) / factorial(k)
+  return(exp(-theta) * sum(terms))
+}
+
+# Passo 2: F(x) = P(X = x)
+fx <- function(x, alpha, theta) {
+  Tx <- tx(x, theta)
+  return((exp(theta * (1 - exp(-alpha))) * (alpha^x) * Tx) / factorial(x))
+}
+
+# Passo 3: Metodo da inversão discreto
+gerar_amostra <- function(alpha, theta, max_x = 50) {
+  px <- purrr::map_dbl(0:max_x, ~ fx(.x, alpha, theta))
+  Fx <- cumsum(px)
+  Fx <- Fx / max(Fx)
+  u <- runif(1)
+  x <- purrr::detect_index(Fx, ~ u <= .x) - 1
+  return(x)
+}
+
+# Exemplo de uso
+alpha <- 1
+theta <- 1
+max_x <- 50
+n = 100
+x <- purrr::map_int(1:n, ~ gerar_amostra(alpha, theta, max_x = max_x))
+hist(x, main = "Histograma da Distribuição Bell-Touchard",probability = TRUE, col = "lightblue")
+curve(fx(x, alpha, theta), from = 0, to = max_x, col = "red", lwd = 1.5, , add = TRUE)
+```
+
+> O gráfico acima mostra a função de massa de probabilidade da distribuição Bell-Touchard para diferentes valores de $x$, com $\alpha = 1.0$ e $\theta = 2.0$.
+
+
+##### b) Distribuição *Kumaraswamy modificado*
+A variável aleatória \( Y \) possui função densidade de probabilidade dada por:
+
+$$
+f(y; \alpha, \beta) = \frac{\alpha \beta e^{\alpha - \alpha/y} (1 - e^{\alpha - \alpha/y})^{\beta - 1}}{y^2}, \quad y \in (0,1).
+$$
+
+Usando o resultado da função quantil, temos: 
+
+$$
+F_Y(y)^{-1} = \frac{\alpha}{\alpha - log(1 - (1 - u)^{1/\beta})}
+$$ 
+
+
+```{r}
+# Função de densidade da Kumaraswamy modificada
+# Definição da função de densidade da Kumaraswamy modificada
+fy <- function(y, alpha, beta) {
+  (alpha * beta * exp(alpha - alpha / y) * (1 - exp(alpha - alpha / y))^(beta - 1)) / (y^2)
+}
+
+# Teste da função
+print(fy(0.5, 1, 1))
+
+# Geração de amostras da Kumaraswamy modificada
+y_KM <- function(N = 1000, alpha = 1, beta = 1) {
+  u <- runif(N)
+  y <- alpha / (alpha - log(1 - (1 - u)^(1/beta)))
+  return(y)
+}
+
+# Parâmetros
+alpha <- 1
+beta <- 1
+N <- 10000
+
+# Geração de amostras
+y <- y_KM(N = N, alpha = alpha, beta = beta)
+
+# Resumo estatístico
+summary(y)
+
+# Histograma dos valores gerados
+hist(y, 
+     probability = TRUE,
+     col = "lightblue",  
+     main = paste("N =", length(y))
+     )
+curve(fy(x, alpha = 1, beta = 1), from = 0, to = 1, col = "red", lwd = 1.5, , add = TRUE)
+
+```
+
+### Questão 2. 
+Use o método de Monte Carlo para estimar a seguinte integral:
+
+$$
+\int_{-\infty }^{\infty } \int_{0}^{2} \int_{0}^{\infty} ycos(\pi y) e^{-x^2y} e^{-yz} dz dy dx
+$$
+Como não existe dependência entre as variáveis, podemos calcular a integral de forma separada.
+
+```{r}
+## g(x,y,z)
+g <- function(x, y, z) {
+  return(y * cos(pi * y) * exp(-x^2 * y) * exp(-y * z))
+}
+
+N <- 10000
+
+# f(z)
+z <- rexp(N)
+f_z <- function(z) {
+  z <- dexp(z)
+  return(z)
+}
+
+# f(y)
+y <- runif(N, 0, 2)
+f_y <- function(y) {
+  y <- dunif(y, 0, 2)
+  return(y)
+}
+
+# f(x)
+x <- rnorm(N)
+f_x <- function(x) {
+  x <- dnorm(x)
+  return(x)
+}
+
+# h(x,y,z)
+h = g(x, y, z)/(f_x(x) * f_y(y) * f_z(z))
+
+# Estimativa da integral
+est_I <- mean(h) |> round(4)
+
+# Intervalo de confiança a 98%
+se <- sd(h) / sqrt(N)
+z_crit <- qnorm(0.98)
+IC <- c(est_I - z_crit * se, est_I + z_crit * se) |> round(4)
+
+
+glue::glue("Estimativa da integral: {est_I} e considerando um intervalo de confiança de 98%, temos: IC: ({IC[1]}, {IC[2]})")
+
+```
+
+### Questão 3.
+Experimento
+
+```{r}
+# Etapa 1.
+set.seed(123)
+n <- 10
+
+resultados <- data.frame(
+  cara = sample(c(0, 1), n, replace = TRUE, prob = c(1/3, 2/3)),
+  bola = NA,
+  valor = NA
+)
+
+# Etapa 2
+resultados <- resultados |>
+  rowwise() |>
+  mutate(bola = if_else(
+    cara == 1,
+    sample(c("amarela", "azul"), 1, replace = TRUE, prob = c(3/5, 2/5)),
+    sample(c("amarela", "azul"), 1, replace = TRUE, prob = c(2/6, 4/6))
+  )) |>
+  ungroup()
+
+# Etapa 3
+resultados <- resultados |>
+  rowwise() |>
+  mutate(valor = if_else(
+    bola == "amarela",
+    actuar::rztpois(1, lambda = 2),
+    sum(VGAM::rbilogis(1, loc1 = 5, loc2 = 7, scale1 = 1, scale2 = exp(1)))
+    )) |>
+  ungroup()
+
+print(resultados)
+
+```
