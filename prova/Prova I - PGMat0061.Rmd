@@ -15,18 +15,19 @@ instalar_pkt <- function(pacotes) {
   if (any(!instalados)) install.packages(pacotes[!instalados])
 }
 
-instalar_pkt(c("purrr", "ggplot2", "glue", "dplyr", "VGAM", "actuar"))
+instalar_pkt(c("purrr", "ggplot2", "glue", "dplyr", "VGAM", "actuar", "countDM"))
 
 #
 library(ggplot2)
 library(dplyr)
+set.seed(123)
 ```
 
 ### Questão 1.
 
 Escreva um algoritimo de simulação para gerar uma valores
 
-##### a) Distribuição Bell-Touchard
+##### a) **Distribuição Bell-Touchard**
 
 A variável aleatória $X$ possui função massa de probabilidade dada por:
 
@@ -41,69 +42,51 @@ T_x(\theta) = e^{-\theta} \sum_{k=0}^{\infty} \frac{k^x \theta^k}{k!}
 $$
 
 ```{r, echo=TRUE}
-# Passo 1: Função para calcular o polinômio de Touchard
-tx <- function(x, theta, max_k = 500) {
+# 1. Polinômio de Touchard
+tx <- function(x, theta, max_k = 100) {
   k <- 0:max_k
   somatorio <- (k^x) * (theta^k) / factorial(k)
   return(exp(-theta) * sum(somatorio))
 }
 
-# Passo 2: f(x) = P(X = x)
-fx <- function(x, alpha, theta, max_x = 50) {
-  Tx <- tx(x, theta)
+# 2. Função f(x) = p(x)
+fx <- function(x, alpha, theta, max_x = 100) {
+  Tx <- sapply(0:max_x, function(i) tx(i, theta, max_x))
+  
   p1 <- exp(theta * (1 - exp(-alpha)))
-  p2 <- (alpha^x) * Tx
-  y <- (p1 * p2) / factorial(x)
-  return(y)
+  p2 <- (alpha^x) * Tx[x + 1] / factorial(x)
+  y <- p1 * p2
+  
+  # denominador
+  denominador <- sum((alpha^(0:max_x) * Tx) / factorial(0:max_x)) * p1
+  return(y / denominador)
 }
 
-
-alpha <- 2
-theta <- 3/2
-x <- 5
-
-Tx <- tx(x, theta)
-p1 <- exp(theta * (1 - exp(-alpha)))
-p2 <- (alpha^x) * Tx
-y <- (p1 * p2) / factorial(x)
-
-cat("Tx:", Tx, "\n")
-cat("p1:", p1, "\n")
-cat("p2:", p2, "\n")
-cat("fx(x):", y, "\n")
-
-
-fx(5, 2, 3/2) # Erro, valores maiores que 1
-sum(sapply(0:20, function(x) fx(x, 2, 3/2)))
-
-# Passo 3: Metodo da inversão discreto
+# 3. Gerar valores a Metodo da inversa (discreto)
 gerar_amostra <- function(alpha, theta, max_x = 50) {
-  px <- purrr::map_dbl(0:max_x, ~ fx(.x, alpha, theta))
-  Fx <- cumsum(px)
+  px <- sapply(0:max_x, function(x) fx(x, alpha, theta, max_x))
+  px <- px / sum(px)  
+  Fx <- cumsum(px)    
+  
   u <- runif(1)
-  x <- purrr::detect_index(Fx, ~ u <= .x) - 1
-  return(x)
+  return(which.max(Fx >= u) - 1)
 }
 
-# Exemplo de uso
+
 alpha <- 2
 theta <- 3/2
-max_x <- 20
-n = 100
-x <- purrr::map_int(1:n, ~ gerar_amostra(alpha, theta, max_x = max_x))
+n <- 50
+x <- purrr::map_int(1:n, ~ gerar_amostra(alpha, theta, max_x = n))
 
- 
-hist(x,
-     main = "Histograma da Distribuição Bell-Touchard",
-     probability = TRUE
-     ,col = "lightblue"
-     )
-curve(fx(x, alpha, theta), from = 0, to = max_x, col = "red", lwd = 1.5, , add = TRUE)
+
+hist(x, probability = TRUE, ylim = c(0,.06),  col = "lightblue"  )
+curve(countDM::dbellt(x, lambda = alpha, theta = theta), add = TRUE, col="red")
+
 ```
 
-> O gráfico acima mostra a função de massa de probabilidade da distribuição Bell-Touchard para diferentes valores de $x$, com $\alpha = 1.0$ e $\theta = 2.0$.
+> O gráfico acima mostra a f.d.p da distribuição Bell-Touchard para diferentes valores de $x$, com $\alpha = 2$ e $\theta = 3/2$.
 
-##### b) Distribuição *Kumaraswamy modificado*
+##### b) **Distribuição *Kumaraswamy modificado* **
 
 A variável aleatória $Y$ possui função densidade de probabilidade dada por:
 
@@ -204,11 +187,10 @@ glue::glue("Estimativa da integral: {est_I} e considerando um intervalo de confi
 
 ### Questão 3.
 
-Experimento
+> A tabela abaixo mostra os resultados de cada estapa do experimento repetido 25 vezes
 
 ```{r}
 # Etapa 1.
-set.seed(123)
 n <- 25
 
 resultados <- data.frame(
@@ -270,37 +252,4 @@ Acima estão os valores estimados da correlação entre $U$ e $\sqrt{1 - U^2}$. 
 # 
 
 **Bom recesso!**
-
-```{r}
-# Função para calcular o polinômio de Touchard
-# Adicionamos uma normalização para evitar problemas numéricos
-tx <- function(x, theta, max_k = 100) {
-  k <- 0:max_k
-  somatorio <- (k^x) * (theta^k) / factorial(k)
-  return(exp(-theta) * sum(somatorio))
-}
-
-# Função de massa de probabilidade da distribuição Bell-Touchard
-fx <- function(x, alpha, theta, max_x = 100) {
-  if (x < 0 || floor(x) != x) return(0)  # Garantir que x seja inteiro e não negativo
-  
-  Tx <- tx(x, theta, max_x)
-  p1 <- exp(theta * (1 - exp(-alpha)))
-  p2 <- (alpha^x) * Tx / factorial(x)
-  y <- p1 * p2
-  
-  # Normaliza para garantir que seja uma fdp
-  normalizador <- sum(sapply(0:max_x, function(i) {
-    Tx_i <- tx(i, theta, max_x)
-    (exp(theta * (1 - exp(-alpha))) * (alpha^i * Tx_i)) / factorial(i)
-  }))
-  
-  return(y / normalizador)
-}
-
-# Teste para garantir que a soma seja aproximadamente 1
-soma_fdp <- sum(sapply(0:50, function(x) fx(x, 2, 3/2)))
-cat("Soma da fdp:", soma_fdp, "\n")
-
-```
 
