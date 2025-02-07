@@ -181,7 +181,7 @@ m.rejeicao <- function(n, theta, lambda) {
 
 
 # Parâmetros fixos
-theta <- 1
+theta <- 1/2
 lambda <- 1
 n <- 10000
 
