@@ -79,8 +79,8 @@ n <- 50
 x <- purrr::map_int(1:n, ~ gerar_amostra(alpha, theta, max_x = n))
 
 
-hist(x, probability = TRUE, ylim = c(0,.06),  col = "lightblue"  )
-curve(countDM::dbellt(x, lambda = alpha, theta = theta), add = TRUE, col="red")
+hist(x, probability = TRUE, ylim = c(0,.06), xlim = c(0,n),  col = "lightblue" ,  )
+#curve(countDM::dbellt(x, lambda = alpha, theta = theta), add = TRUE, col="red")
 
 ```
 
